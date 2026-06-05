@@ -1,0 +1,75 @@
+##################################################
+# Full Path-aware KT experiment config for Apple Silicon (M4 Pro)
+# Optimized for MPS backend with float16
+##################################################
+
+seed: 0
+exp_name: 'path_aware_kt_apple'
+save_model: true
+testing: false
+log_train_every_itr: 10
+model_save_dir: 'checkpoints'
+use_cuda: false    # <-- disabled for Apple Silicon
+use_mps: true      # <-- Apple Silicon Metal
+log_wandb: false
+continue_training: false
+start_epoch: 0
+wandb_project: 'path_aware_kt'
+wandb_key: ''
+multitask: true
+kc_loss: true
+
+# data_opts
+data_path: 'data'
+test_size: 0.2
+max_len: 20
+label_type: 'binary'
+first_ast_convertible: true
+split_by: 'student'
+
+# model_lstm_opts
+use_lstm: true
+lstm_inp_dim: 4296
+train_lstm: true
+num_layers: 1
+lstm_lr: 0.0005
+baseline: false
+transition: false
+
+# LLM — use smaller LoRA for memory efficiency on 18GB
+okt_model: 'meta-llama/Meta-Llama-3-8B-Instruct'
+train_okt: true
+
+# Training — smaller batch for memory
+epochs: 5
+batch_size: 1       # <-- reduced for 18GB M4 Pro (use 2 for 36GB)
+accum_iter: 2       # <-- gradient accumulation compensates small batch
+lr: 0.00001
+trans_linear_lr: 0.0001
+pred_linear_lr: 0.0001
+binary_loss_fn: 'BCE'
+use_scheduler: true
+warmup_ratio: 0.1
+alpha: 0.8
+kc_loss_method: 'prod'
+
+# LoRA — reduced rank for memory
+lora_alpha: 128     # <-- reduced from 256
+lora_dropout: 0.05
+lora_r: 64          # <-- reduced from 128 (saves ~2GB)
+
+# evaluation
+nsamples: 1
+k: 1
+p: 0
+max_new_tokens: 400
+change_generation_length: false
+
+# PATH-AWARE OPTIONS
+path_mode: 'hard'
+path_dir: 'path_cache'
+n_paths: 3
+randomize_paths: false
+kc_path: 'problem_kc.json'
+predictor_multilayer: false
+temperature: 1.0
