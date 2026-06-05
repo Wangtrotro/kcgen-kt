@@ -40,10 +40,10 @@ transition: false
 okt_model: 'meta-llama/Meta-Llama-3-8B-Instruct'
 train_okt: true
 
-# Training — smaller batch for memory
+# Training — tuned for 24GB M4 Pro
 epochs: 5
-batch_size: 1       # <-- reduced for 18GB M4 Pro (use 2 for 36GB)
-accum_iter: 2       # <-- gradient accumulation compensates small batch
+batch_size: 1       # <-- Llama-3-8B float16 uses ~16GB, leave room for activations
+accum_iter: 2       # <-- effective batch = 2
 lr: 0.00001
 trans_linear_lr: 0.0001
 pred_linear_lr: 0.0001
@@ -53,10 +53,10 @@ warmup_ratio: 0.1
 alpha: 0.8
 kc_loss_method: 'prod'
 
-# LoRA — reduced rank for memory
-lora_alpha: 128     # <-- reduced from 256
+# LoRA — balanced for 24GB (model ~16GB + LoRA ~2GB + activations ~4GB)
+lora_alpha: 192     # <-- slightly below full 256
 lora_dropout: 0.05
-lora_r: 64          # <-- reduced from 128 (saves ~2GB)
+lora_r: 96          # <-- sweet spot for 24GB
 
 # evaluation
 nsamples: 1
