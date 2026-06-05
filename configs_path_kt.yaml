@@ -1,0 +1,88 @@
+##################################################
+# Path-aware KT experiment config
+# Extends configs_kc.yaml with path-specific options
+##################################################
+
+# exp_opts (same as base)
+seed: 0
+exp_name: 'path_aware_kt'
+save_model: true
+testing: false
+log_train_every_itr: 10
+model_save_dir: 'checkpoints'
+use_cuda: true
+log_wandb: false
+continue_training: false
+start_epoch: 0
+wandb_project: 'path_aware_kt'
+wandb_key: ''
+multitask: true
+kc_loss: true
+
+# data_opts (same as base)
+data_path: 'data'
+test_size: 0.2
+max_len: 20
+label_type: 'binary'
+first_ast_convertible: true
+split_by: 'student'
+
+# model_lstm_opts (same as base)
+use_lstm: true
+lstm_inp_dim: 4296
+train_lstm: true
+num_layers: 1
+lstm_lr: 0.0005
+baseline: false
+transition: false
+
+# model_gpt_opts (same as base)
+okt_model: 'meta-llama/Meta-Llama-3-8B-Instruct'
+train_okt: true
+
+# train_generator_opts (same as base)
+epochs: 3
+batch_size: 2
+accum_iter: 1
+lr: 0.00001
+trans_linear_lr: 0.0001
+pred_linear_lr: 0.0001
+binary_loss_fn: 'BCE'
+use_scheduler: true
+warmup_ratio: 0.1
+alpha: 0.8
+kc_loss_method: 'prod'
+
+# LoRA configs (same as base)
+lora_alpha: 256
+lora_dropout: 0.05
+lora_r: 128
+
+# evaluation configs
+nsamples: 1
+k: 1
+p: 0
+max_new_tokens: 400
+change_generation_length: false
+
+##################################################
+# PATH-AWARE SPECIFIC OPTIONS
+##################################################
+# Path mode: 'hard' (binary mask), 'soft' (weighted), 'none' (original)
+path_mode: 'hard'
+
+# Directory containing path discovery results
+path_dir: 'path_cache'
+
+# Number of solution paths per problem
+n_paths: 3
+
+# Ablation: set to true to randomize path assignments (should degrade performance)
+randomize_paths: false
+
+# KC path file (same as base kc_path)
+kc_path: 'problem_kc.json'
+
+# Predictor options
+predictor_multilayer: false
+temperature: 1.0
