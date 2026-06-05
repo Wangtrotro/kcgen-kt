@@ -242,16 +242,16 @@ def main():
 
     # Save results
     output = {
-        'total_problems_tested': total_tested,
-        'significant_count': sig_count,
-        'significance_rate': sig_count / max(total_tested, 1),
+        'total_problems_tested': int(total_tested),
+        'significant_count': int(sig_count),
+        'significance_rate': float(sig_count / max(total_tested, 1)),
         'mean_effect_size': float(np.mean(effect_sizes)) if results else 0,
         'detailed_results': {str(k): {
-            'p_value': v['p_value'],
-            'significant': v['significant'],
-            'effect_size': v['effect_size'],
-            'means_by_path': {str(pk): pv for pk, pv in v['means_by_path'].items()},
-            'sizes_by_path': {str(pk): pv for pk, pv in v['sizes_by_path'].items()},
+            'p_value': float(v['p_value']),
+            'significant': bool(v['significant']),
+            'effect_size': float(v['effect_size']),
+            'means_by_path': {str(pk): float(pv) for pk, pv in v['means_by_path'].items()},
+            'sizes_by_path': {str(pk): int(pv) for pk, pv in v['sizes_by_path'].items()},
         } for k, v in results.items()}
     }
     output_file = os.path.join(args.path_dir, "path_difference_analysis.json")
