@@ -29,7 +29,11 @@ def generate_path_kcs(problem_text, path_codes, path_id, model='gpt-4o', tempera
     Returns:
         list of KC names specific to this path
     """
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+    from openai import OpenAI
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+    )
 
     code_section = "\n\n".join(
         [f"## Solution {i+1} (Path {path_id}):\n{code}" for i, code in enumerate(path_codes)]
@@ -56,7 +60,7 @@ Return your response as a JSON object:
     user_prompt = f"# Problem:\n{problem_text}\n\n# Solutions following this approach:\n{code_section}\n\nIdentify the KCs specific to this solution approach."
 
     try:
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(
             model=model,
             response_format={"type": "json_object"},
             messages=[

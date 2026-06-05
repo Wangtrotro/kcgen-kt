@@ -1,1 +1,252 @@
-{}
+{
+  "13": {
+    "0": "Use nested conditionals to apply different speed thresholds depending on whether it is the driver\u2019s birthday, returning 0/1/2 accordingly.",
+    "1": "Adjust speed for birthday, then return 0 if speed<=60; otherwise return 1 for 61-80 inclusive and 2 for >80 using conditional logic.",
+    "2": "Adjust speed for birthday discount, then use conditional ranges to return 0/1/2 based on thresholds."
+  },
+  "232": {
+    "0": "Use conditional logic (if/else) to map (day, vacation) to the correct alarm time string, with special cases for weekend vs weekday and vacation vs non-vacation.",
+    "1": "Use nested if/else conditionals based on the vacation flag and whether the day is a weekend (day==0 or day==6) to return the correct alarm time string.",
+    "2": "Use nested if/else conditions based on the vacation flag and whether the day is a weekend (day==0 or day==6) to return the correct alarm string."
+  },
+  "235": {
+    "0": "Use conditional logic with threshold comparisons to map (you, date) stylishness values into three discrete outcomes (0/1/2).",
+    "1": "Use conditional branching (if/else) to map input ranges of you and date to discrete return values 0, 1, or 2.",
+    "2": "Use conditional logic with boundary checks to map (you, date) stylishness ranges to discrete outcomes 0/1/2."
+  },
+  "234": {
+    "0": "Use conditional logic to apply different acceptance rules for weekend vs non-weekend, then return the corresponding boolean expression.",
+    "1": "Use conditional logic (if/else) to check whether cigars fall in the required range, with a special case for weekends (no upper bound).",
+    "2": "Check whether the party is on a weekend; if not, return true only when cigars are between 40 and 60 inclusive, otherwise return true when cigars are at least 40 (no upper bound)."
+  },
+  "236": {
+    "0": "Use conditional checks to classify (a,b,c) into three cases: all equal, exactly two equal, or all distinct, returning the specified value for each case.",
+    "1": "Use nested equality checks to classify whether all three numbers are equal, exactly two are equal, or all are distinct.",
+    "2": "Use conditional checks to classify whether all three integers are equal, exactly two are equal, or all are distinct."
+  },
+  "5": {
+    "0": "Use nested conditional logic (if/else) to encode the rules: never answer if asleep; otherwise answer in general except during morning unless the caller is mom.",
+    "1": "Use boolean conditionals with early returns to encode the priority rules: if asleep return false; otherwise if mom return true; else return the negation of isMorning.",
+    "2": "Use boolean conditionals with early return: first block answering when asleep, then handle the special morning/mom cases, otherwise answer."
+  },
+  "233": {
+    "0": "Check whether either input equals 6; otherwise check whether the sum equals 6 or the absolute difference equals 6.",
+    "1": "Check whether a or b equals 6; otherwise check whether a+b equals 6 or the absolute difference |a-b| equals 6, returning true if any condition holds.",
+    "2": "Check whether either input equals 6, or whether their sum equals 6, or whether the absolute difference equals 6; return true if any condition holds, otherwise false."
+  },
+  "1": {
+    "0": "Compute a+b, then use a conditional to replace any result in the forbidden range [10,19] with 20.",
+    "1": "Compute a+b, then use a conditional to detect whether the sum is within the forbidden range [10,19]; if so return 20, otherwise return the computed sum.",
+    "2": "Compute a+b, check whether it falls in the forbidden range [10,19]; if so return 20, otherwise return the actual sum."
+  },
+  "3": {
+    "0": "Use conditional logic with boolean flags to choose between two different range checks, combining comparisons with logical AND/OR.",
+    "1": "Use conditional branching to handle two modes: check inclusive range 1..10 when outsideMode is false, otherwise check n <= 1 or n >= 10.",
+    "2": "Use a boolean flag to choose between two range-check conditions, implemented with if/else and logical operators."
+  },
+  "12": {
+    "0": "Use conditional logic to choose the correct temperature upper bound based on whether it is summer, then check inclusive range membership.",
+    "1": "Use nested conditional logic to check whether the temperature falls within the correct inclusive range, where the upper bound depends on whether it is summer.",
+    "2": "Use conditional logic to check whether the temperature falls within the inclusive playing range, where the upper bound depends on whether it is summer."
+  },
+  "24": {
+    "0": "Use conditional logic to compare each input to 21, handle the case where both exceed 21, and otherwise return the value closest to 21 without exceeding it.",
+    "1": "Use nested if/else comparisons to handle cases where values exceed 21, then otherwise return the larger value that is <= 21 (nearest to 21 without going over).",
+    "2": "Check whether each input exceeds 21; if both exceed return 0; if only one exceeds return the other; otherwise return the larger value (closest to 21 without going over)."
+  },
+  "100": {
+    "0": "Round each input to the nearest multiple of 10 using its rightmost digit, then sum the three rounded values.",
+    "1": "Round each input to the nearest multiple of 10 using its rightmost digit (mod 10), then sum the rounded results.",
+    "2": "Round each input to the nearest multiple of 10 using its rightmost digit (>=5 rounds up, <5 rounds down), then sum the three rounded values."
+  },
+  "101": {
+    "0": "Greedily use as many 5-kilo (big) bars as possible (up to the available count), then use remaining 1-kilo (small) bars if the remainder can be formed; otherwise return -1.",
+    "1": "Greedily use as many 5-kilo (big) bars as possible (up to the available count), then use remaining 1-kilo (small) bars if the remainder can be covered; otherwise return -1.",
+    "2": "Use as many 5-kilo big bars as possible, then check whether the remaining kilos can be filled using only 1-kilo small bars; otherwise return -1."
+  },
+  "102": {
+    "0": "Check whether the first two characters equal the last two characters; if they do, return the string starting from index 2, otherwise return the original string (handle strings shorter than 2).",
+    "1": "Check whether the first two characters equal the last two characters; if they do, return the string starting from index 2, otherwise return the original string.",
+    "2": "Check whether the first two characters equal the last two characters; if they do, return the string starting from index 2, otherwise return the original string (handle strings shorter than 2)."
+  },
+  "25": {
+    "0": "Check for equality cases, reject duplicates, then verify that the three pairwise absolute differences contain two equal adjacent gaps (i.e., the values can be ordered into an arithmetic progression).",
+    "1": "Sort the three integers to identify small, medium, and large, then check whether (medium - small) equals (large - medium).",
+    "2": "Sort the three numbers in ascending order using pairwise swaps, then check whether consecutive differences are equal (a-b == b-c)."
+  },
+  "21": {
+    "0": "Use sequential conditional checks to stop summing at the first occurrence of 13, returning the partial sum of values to the left.",
+    "1": "Use sequential conditional checks for each parameter; when a value equals 13, return the sum of only the values to its left (or 0 if it\u2019s the first).",
+    "2": "Use sequential conditional checks (if/else-if) to stop summing at the first value equal to 13, returning the partial sum of values to its left."
+  },
+  "20": {
+    "0": "Compare all pairs among a, b, c to detect duplicates; if any two are equal, exclude the duplicated value(s) from the sum by returning the appropriate remaining value or 0 when all three match.",
+    "1": "Handle duplicate cases with conditional checks for equality among (a,b,c); return the non-duplicated value or 0 when all three are equal; otherwise return a+b+c.",
+    "2": "Compute the sum by adding only values that are unique among (a,b,c), using pairwise inequality checks to determine which elements are not duplicated."
+  },
+  "17": {
+    "0": "Use a sequence of conditional checks (if/else-if/else) to map the ticket values (a,b,c) to the required outputs based on specific equality/inequality patterns.",
+    "1": "Use nested conditional statements to check equality/inequality relationships among a, b, c and return the specified constants based on those cases.",
+    "2": "Use a sequence of conditional checks (if/else) to map the three ticket values (0,1,2) to the required outputs based on specific equality/inequality patterns."
+  },
+  "22": {
+    "0": "Use a helper method to convert any teen value (13\u201319 excluding 15 and 16) to 0, then sum the fixed values.",
+    "1": "Use a helper method to convert any teen value (13\u201319 excluding 15 and 16) to 0, then sum the three fixed values.",
+    "2": "Use a helper method to convert any teen value (13\u201319) to 0 except 15 and 16, then sum the three fixed values."
+  },
+  "28": {
+    "0": "Handle string length cases (0, 1, >=2) and build the required output using concatenation or substring.",
+    "1": "Use string length checks and substring/character access to build a 2-character result, padding with '@' when needed.",
+    "2": "Use string length checks and Java substring/concatenation to build a 2-character result, padding with '@' when needed."
+  },
+  "40": {
+    "0": "Use Java string search to find the first and last indices of the word \"bread\", then extract the substring between them; if either is missing or they refer to the same occurrence, return \"\".",
+    "1": "Scan the string to find the first index where the substring \"bread\" starts, then scan backward to find the last such index; return the substring between (first+5) and last, or \"\" if fewer than two occurrences.",
+    "2": "Scan the string to find the first and last occurrences of the substring \"bread\", then return the substring between them (or \"\" if fewer than two occurrences)."
+  },
+  "37": {
+    "0": "Convert both strings to lowercase for case-insensitive comparison, then extract the suffix of the longer string with the same length as the shorter string and compare for equality.",
+    "1": "Convert both strings to lowercase for case-insensitive comparison, extract the ending substring of the longer string with the same length as the shorter string, then check if the extracted ending equals the shorter string.",
+    "2": "Convert both strings to lowercase to make the comparison case-insensitive, then use endsWith to check whether either string is a suffix of the other."
+  },
+  "38": {
+    "0": "Scan the string for the substring \"xyz\" and ensure the character immediately before each candidate occurrence is not a period ('.').",
+    "1": "Scan the string for every position where 'xyz' could start, check the three consecutive characters, and ensure the character immediately before the match (if any) is not a period.",
+    "2": "Recursively search for occurrences of \"xyz\" that are not part of a \".xyz\" sequence by splitting the string around any \".xyz\" matches; if no \".xyz\" exists, check whether \"xyz\" occurs anywhere."
+  },
+  "128": {
+    "0": "Scan the string with a sliding window of length 3; for each position i, check whether str[i] and str[i+2] are 'b' (the middle character can be anything).",
+    "1": "Scan the string for any index i where str[i] is 'b', str[i+2] is 'b', and i+1 can be any character (i.e., check for the pattern b?b).",
+    "2": "Scan the string left to right using a small state variable (step) to detect the pattern b _ b, where the middle character can be anything."
+  },
+  "39": {
+    "0": "Scan the string from right to left, ensuring that no 'x' appears before a later 'y'; return false immediately when an 'x' is found, and true when a 'y' is encountered (or true if no 'x' exists).",
+    "1": "Scan the string from right to left, tracking whether a 'y' has been seen after any 'x'; if an 'x' is found before any later 'y', return false, otherwise return true.",
+    "2": "Use string index operations to check whether every 'x' has a 'y' after it by comparing the last occurrence positions of 'x' and 'y'."
+  },
+  "36": {
+    "0": "Scan the string with a sliding window of length 4 and count positions where the pattern matches 'c' 'o' then any letter for the 4th character (i.e., 'd' is flexible).",
+    "1": "Scan the string with a sliding window of length 4 and count positions where the pattern matches: 'c' at offset 0, 'o' at offset 1, any letter at offset 2, and 'e' at offset 3.",
+    "2": "Scan the string with a sliding window of length 4, check character-by-character for the pattern c o _ e (where the third char can be any letter), count matches, and advance the index appropriately to avoid overlapping."
+  },
+  "32": {
+    "0": "Scan the input string left-to-right; at each index, check whether the next substring matches the target word. If it matches, append the word and advance by word length; otherwise append '+' and advance by 1.",
+    "1": "Scan the string for each occurrence of the given word; append '+' for all characters before each match, append the word unchanged for each match, and continue until the end.",
+    "2": "Scan the input string left-to-right; at each index, check whether the remaining suffix starts with the target word. If yes, append the word and advance by its length; otherwise append '+' and advance by 1."
+  },
+  "31": {
+    "0": "Extract the last n characters using substring, then build the result by repeating that extracted suffix n times via a loop and concatenation.",
+    "1": "Extract the last n characters of the input string, then append that substring to a StringBuilder n times and return the result.",
+    "2": "Extract the last n characters using substring, then build the output by repeating that extracted substring n times in a loop."
+  },
+  "33": {
+    "0": "Interleave characters from two strings by iterating up to the longer length, appending the i-th character from each string when it exists, then return the built result.",
+    "1": "Interleave characters from two strings by index using a loop, then append any remaining characters from the longer string.",
+    "2": "Interleave characters from two strings up to the length of the shorter string, then append the remaining substring from the longer string."
+  },
+  "34": {
+    "0": "Scan the string left-to-right; whenever you see a 'z' at position i with 'p' at i+2, append only 'z' and 'p' (skipping the middle letter) and advance by 3; otherwise append the current character and advance by 1.",
+    "1": "Use a regular expression to find every three-letter substring that starts with 'z', has any single letter in the middle, and ends with 'p', then replace each match with 'zp' (dropping the middle character).",
+    "2": "Scan the string left-to-right; whenever the current index i is the middle of a 3-letter window (i-1,i,i+1) that matches 'z' _ 'p', remove the previously appended middle character from the output."
+  },
+  "41": {
+    "0": "Directly access the three fixed indices of the input array and add them together.",
+    "1": "Iterate through the array using an enhanced for-loop, accumulate a running total, and return it.",
+    "2": "Iterate through the array with a loop, conditionally skip elements equal to 13, accumulate the remaining values into a running sum, then return the sum."
+  },
+  "43": {
+    "0": "Handle the two cases (array length < 2 vs. >= 2) and return either the original array or a new array containing the first two elements.",
+    "1": "Handle edge cases for array lengths 0 and 1, otherwise return a new array containing the first two elements.",
+    "2": "Create a new array sized to the number of available first elements (0, 1, or 2) and copy those elements from the input array."
+  },
+  "44": {
+    "0": "Iterate through the array, use the modulo operator to test whether each element is even, count matches, and return the total.",
+    "1": "Iterate through the array, use the modulo operator to test whether each element is even, count matches, and return the total.",
+    "2": "Iterate through the array and count elements whose remainder when divided by 2 is 0 (even numbers)."
+  },
+  "46": {
+    "0": "Scan adjacent pairs and ensure every pair contains the target value; if any adjacent pair lacks it, return false, otherwise true.",
+    "1": "Scan adjacent pairs in the array; if any adjacent pair has neither element equal to val, return false; otherwise return true.",
+    "2": "Scan adjacent pairs in the array; if any adjacent pair has neither element equal to val, return false; otherwise return true."
+  },
+  "49": {
+    "0": "Iterate through the array with an index; when a 13 is found, skip it and the immediately following element, otherwise add the current element to a running sum.",
+    "1": "Iterate through the array, adding each value to a running sum except when a 13 is encountered; when 13 appears, skip it and also skip the immediately following element by advancing the loop index.",
+    "2": "Iterate through the array, add each element to a running sum except when the element is 13 or when it immediately follows a 13; return 0 for an empty array."
+  },
+  "67": {
+    "0": "Scan the array once, checking for two 7s in adjacent positions (i and i+1) or with exactly one element between them (i and i+2), using bounds to avoid index errors.",
+    "1": "Scan the array and check for a 7 at position i followed by another 7 at i+1 (adjacent) or at i+2 (separated by one element), using bounds checks to avoid index errors.",
+    "2": "Scan the array with an index i and check for a 7 at i followed by either another 7 at i+1 (adjacent) or at i+2 (separated by one element), using bounds checks to avoid out-of-range access."
+  },
+  "104": {
+    "0": "For each index i containing 0, scan all positions to the right (i+1..end) to find the largest odd value; replace nums[i] with it if found, otherwise keep 0.",
+    "1": "For each index i containing 0, scan all elements to the right (i+1..end) to find the largest odd value; replace nums[i] with it if found, otherwise keep 0.",
+    "2": "For each index containing 0, scan to the right to find the largest odd number; replace the 0 with that value (or keep 0 if none)."
+  },
+  "106": {
+    "0": "Compare corresponding elements in the first len positions with the corresponding elements in the last len positions; return true only if all pairs match.",
+    "1": "Compare corresponding elements in the first n positions with the corresponding elements in the last n positions; return false on the first mismatch, otherwise true.",
+    "2": "Compare corresponding elements from the start and end of the array for exactly len positions; return false on the first mismatch, otherwise true."
+  },
+  "107": {
+    "0": "Scan the array once with a boolean state to track whether you are currently inside a clump; increment the count when a new clump starts (two equal adjacent elements) and stop counting when the run ends.",
+    "1": "Scan the array with a pointer; for each run of equal adjacent values, count it as a clump if its length is at least 2.",
+    "2": "Scan adjacent pairs and use a boolean flag to count each clump only once when a run of equal values starts."
+  },
+  "108": {
+    "0": "Scan the array to find 5s that are not immediately after a 4, then swap/move a 5 into the position after some 4 that is not currently followed by a 5, repeating until all 4s are followed by 5.",
+    "1": "Scan left-to-right; whenever a 4 is not immediately followed by 5, swap the needed 5 into position by finding a later 5 that is not already correctly placed (i.e., not preceded by a 4).",
+    "2": "Scan the array left-to-right; whenever a 4 is not immediately followed by 5, shift the needed 5 into that position by finding a later index j that currently holds a 5 not already correctly placed (i.e., not preceded by a 4)."
+  },
+  "45": {
+    "0": "Iterate through the array, adding elements to a running sum except when encountering a 6; then skip forward until the next 7 is reached (inclusive of the 7 by advancing the index).",
+    "1": "Use a single pass with a boolean flag to skip values between a 6 and the next 7 (inclusive of the 6..7 segment).",
+    "2": "Traverse the array while maintaining a boolean flag that indicates whether the current position is inside a \u201c6 ... 7\u201d ignored segment; add elements to the sum only when not in that segment."
+  },
+  "48": {
+    "0": "Use a two-pointer/compaction pass: scan the input, copy all elements not equal to 10 into a new array from the front, and leave the remaining positions as 0.",
+    "1": "Create a new array of the same length, copy over all elements that are not 10 using a write index, and leave the remaining positions as 0.",
+    "2": "Use a two-pointer/compaction approach: find the first non-10, then scan the rest; when a non-10 is found, copy it into the next output position and mark the old spot as 10; finally fill remaining positions with 0."
+  },
+  "51": {
+    "0": "Scan left to right, remember the most recent multiple of 10 (tenMode). When a new multiple of 10 appears, update tenMode; otherwise, if tenMode is set, overwrite the current element with tenMode until the next multiple of 10.",
+    "1": "Scan left to right, keep the most recent multiple of 10 in a variable, and overwrite subsequent elements until the next multiple of 10 is found.",
+    "2": "Scan the array left-to-right, track the most recent multiple of 10 using a flag and a temporary value, and overwrite subsequent non-multiples of 10 until the next multiple of 10 is found."
+  },
+  "56": {
+    "0": "Compute sum, min, and max in one pass, then subtract min and max once each and divide by (n-2) using integer division.",
+    "1": "Compute sum, track min and max in one pass, then subtract one min and one max and divide by (n-2) using integer division.",
+    "2": "Compute sum, track min and max in one pass, subtract one smallest and one largest, then divide by (n-2) using integer division."
+  },
+  "57": {
+    "0": "Allocate an int array of size n, then fill it using a for-loop where index i stores value i; if n is 0 the loop runs zero times and the empty array is returned.",
+    "1": "Allocate an int array of length n, then fill it with values i for each index i using a for-loop; if n is 0 the loop runs zero times and the empty array is returned.",
+    "2": "Allocate an int array of length n, then fill each index i with the value i using a for-loop; return the filled array (works for n=0 because the loop runs 0 times)."
+  },
+  "64": {
+    "0": "Iterate from start (inclusive) to end (exclusive), compute divisibility by 3 and 5 using modulo, and fill a String[] with either the number or the appropriate Fizz/Buzz/FizzBuzz value.",
+    "1": "Create an array sized (end-start), iterate i from start to end-1, and fill each position with either the number\u2019s string or the appropriate Fizz/Buzz/FizzBuzz based on divisibility by 3 and 5.",
+    "2": "Create a String array of length (end-start), iterate from start to end-1, and fill each position with \"FizzBuzz\"/\"Fizz\"/\"Buzz\" based on divisibility by 15/3/5, otherwise store the number as a string."
+  },
+  "70": {
+    "0": "Scan the array left-to-right; whenever a 2 is found, ensure it is immediately followed by another 2 (and skip over any additional consecutive 2s). If any 2 is not adjacent to a 2, return false; otherwise return true.",
+    "1": "Scan the array and ensure every occurrence of 2 has an adjacent 2 on at least one side; handle edge positions separately, then check interior indices.",
+    "2": "Scan the array and ensure every occurrence of 2 is part of a contiguous block of length at least 2 (i.e., no isolated 2). Handle small array lengths as special cases."
+  },
+  "71": {
+    "0": "Compute total sum, then sweep a split point from left to right updating left and right sums; return true when they match.",
+    "1": "Compute total sum, then sweep a split point from left to right updating left and right sums; return true when they match.",
+    "2": "Compute total sum, then sweep a split point from left to right maintaining left (first) and right (second) sums; return true when they match."
+  },
+  "112": {
+    "0": "Use nested loops to fill an array of length n(n+1)/2 with groups 1..i for i=1..n, tracking the next write index with a separate pointer.",
+    "1": "Use nested loops to append the sequence 1..i for each i from 1 to n into a preallocated array whose size is n(n+1)/2.",
+    "2": "Build the array by iterating through its total length and using triangular-number boundaries to reset the repeated value k and advance to the next group j."
+  },
+  "118": {
+    "0": "Store the first element, shift each element one position left in-place, then place the stored element at the last index.",
+    "1": "Store the first element, shift every element one position to the left, then place the stored first element at the last index (in-place).",
+    "2": "Create a new array and fill it so each element moves one position left, with the first element wrapping to the last index (handle empty/singleton arrays)."
+  }
+}
