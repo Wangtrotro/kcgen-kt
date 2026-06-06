@@ -125,14 +125,23 @@ def read_data(file, kc_problem_dict, configs):
     return train_stu, valid_stu, test_stu, df, students
 
 
-def make_pytorch_dataset(students, dataset):
+def make_pytorch_dataset(students, dataset, reasoning_traces=None):
     lstm_student = []
 
     for student in students:
         subset = dataset[dataset['SubjectID'] == student]
-        # Only student with more than one submission is valid since one submission is used for knowledge estimation for next problem
         if len(subset) > 1:
             subset.loc[:, 'prompt-embedding'] = subset['prompt-embedding'].apply(lambda x: torch.tensor(x))
+            
+            traces = []
+            if reasoning_traces and student in reasoning_traces:
+                student_traces = reasoning_traces[student]
+                trace_by_timestep = {t['timestep']: t['reasoning_trace'] for t in student_traces}
+                for i in range(len(subset)):
+                    traces.append(trace_by_timestep.get(i, None))
+            else:
+                traces = [None] * len(subset)
+            
             data_dict = {
                 'SubjectID': student,
                 'ProblemID_seq': subset.ProblemID.tolist(),
@@ -142,19 +151,20 @@ def make_pytorch_dataset(students, dataset):
                 'KC': subset['knowledge_component'].tolist(),
                 'next_prompt': subset.prompt.tolist(),
                 'next_code': subset.Code.tolist(),
+                'reasoning_traces': traces,
             }
 
             lstm_student.append(data_dict)
 
     return lstm_student
 
-def make_dataloader(students, dataset, collate_fn, configs, sampler=None, shuffle=False):
-    lstm_student = make_pytorch_dataset(students, dataset)
+def make_dataloader(students, dataset, collate_fn, configs, sampler=None, shuffle=False, reasoning_traces=None):
+    lstm_student = make_pytorch_dataset(students, dataset, reasoning_traces)
     data_loader = torch.utils.data.DataLoader(lstm_student, collate_fn=collate_fn, shuffle=shuffle, sampler=sampler, batch_size=configs.batch_size)
     return data_loader
 
 
-def build_prompt_with_special_tokens(prompt, kcs):
+def build_prompt_with_special_tokens(prompt, kcs, reasoning_trace=None):
     if ":" in prompt:
         prompt = prompt.replace(":", "")
 
@@ -170,14 +180,59 @@ def build_prompt_with_special_tokens(prompt, kcs):
         kc_level = f" The student's mastery level on {kc} is ?"
         prompt += kc_intro + kc_level
 
+    if reasoning_trace is not None:
+        # When reasoning is provided, include it in the prompt
+        # The delimiter "written" still marks the generation boundary for code
+        # Reasoning is pre-filled context (not generated during training in this mode)
+        prompt += f" Reasoning: {reasoning_trace}"
 
     prompt += " Student written code:"
 
     return prompt
 
 
-def build_input_with_special_tokens(prompt, kcs, code, tokenizer):
-    input = build_prompt_with_special_tokens(prompt, kcs) + " " + code.strip() + tokenizer.eos_token
+def build_reasoning_generation_prompt(prompt, kcs):
+    """Build prompt where the model must GENERATE both reasoning and code.
+    
+    Uses 'Analysis' as the delimiter — everything after 'Analysis' is generation target
+    (both reasoning trace and code).
+    """
+    if ":" in prompt:
+        prompt = prompt.replace(":", "")
+
+    if "?" in prompt:
+        prompt = prompt.replace("?", ".")
+
+    assert "written" not in prompt
+
+    result = "Question: " + prompt
+    for i in range(len(kcs)):
+        kc = kcs[i]
+        kc_intro = f" KC {i+1}: {kc}."
+        kc_level = f" The student's mastery level on {kc} is ?"
+        result += kc_intro + kc_level
+
+    result += " Analysis:"
+
+    return result
+
+
+def build_reasoning_generation_input(prompt, kcs, code, tokenizer, reasoning_trace=""):
+    """Build full training input where model generates reasoning + code.
+    
+    Format: [prompt + KC mastery] Analysis: [reasoning] Student written code: [code]
+    The delimiter is 'Analysis' — loss is computed on everything after it.
+    """
+    prompt_part = build_reasoning_generation_prompt(prompt, kcs)
+    generation_part = ""
+    if reasoning_trace:
+        generation_part += f" {reasoning_trace}"
+    generation_part += " Student written code: " + code.strip() + tokenizer.eos_token
+    return prompt_part + generation_part
+
+
+def build_input_with_special_tokens(prompt, kcs, code, tokenizer, reasoning_trace=None):
+    input = build_prompt_with_special_tokens(prompt, kcs, reasoning_trace) + " " + code.strip() + tokenizer.eos_token
     return input
 
 
@@ -191,6 +246,15 @@ class CollateForKC(object):
         self.level_token_id = tokenizer.convert_tokens_to_ids('Ġ?')
         self.kc_dict = kc_dict
         self.eval = eval
+        
+        self.use_reasoning_gen = getattr(configs, 'use_reasoning', False) and \
+                                  getattr(configs, 'reasoning_mode', 'trained') == 'trained'
+        if self.use_reasoning_gen:
+            self.analysis_token_id = tokenizer.convert_tokens_to_ids("Analysis")
+            if self.analysis_token_id is None:
+                self.analysis_token_ids = tokenizer.encode("Analysis", add_special_tokens=False)
+            else:
+                self.analysis_token_ids = None
 
 
     def __call__(self, batch):
@@ -249,11 +313,24 @@ class CollateForKC(object):
         stacked_prompts = list(map(list, zip(*padded_prompts)))
 
         if self.eval:
-            input_texts = [[build_prompt_with_special_tokens(prompt_i, kc_i) for prompt_i, kc_i in
-                            zip(entry['next_prompt'], entry['KC'])] for entry in batch]
+            if self.use_reasoning_gen:
+                input_texts = [[build_reasoning_generation_prompt(prompt_i, kc_i) for prompt_i, kc_i in
+                                zip(entry['next_prompt'], entry['KC'])] for entry in batch]
+            else:
+                input_texts = [[build_prompt_with_special_tokens(prompt_i, kc_i) for prompt_i, kc_i in
+                                zip(entry['next_prompt'], entry['KC'])] for entry in batch]
         else:
-            input_texts = [[build_input_with_special_tokens(prompt_i, kc_i, code_i, self.tokenizer) for
-                            prompt_i, kc_i, code_i in zip(entry['next_prompt'], entry['KC'], entry['next_code'])] for entry in batch]
+            if self.use_reasoning_gen:
+                reasoning_traces_batch = [b.get('reasoning_traces', [None]*len(b['next_code'])) for b in batch]
+                input_texts = [[build_reasoning_generation_input(prompt_i, kc_i, code_i, self.tokenizer, trace_i or "") 
+                               for prompt_i, kc_i, code_i, trace_i in 
+                               zip(entry['next_prompt'], entry['KC'], entry['next_code'], traces)] 
+                              for entry, traces in zip(batch, reasoning_traces_batch)]
+            else:
+                reasoning_traces_batch = [b.get('reasoning_traces', [None]*len(b['next_code'])) for b in batch]
+                input_texts = [[build_input_with_special_tokens(prompt_i, kc_i, code_i, self.tokenizer, trace_i) for
+                                prompt_i, kc_i, code_i, trace_i in zip(entry['next_prompt'], entry['KC'], entry['next_code'], traces)] 
+                               for entry, traces in zip(batch, reasoning_traces_batch)]
 
 
         inputs_ids_ls, attention_mask_ls, labels_ls, prompt_id_lens_ls, level_loc_ls = [], [], [], [], []
@@ -269,9 +346,19 @@ class CollateForKC(object):
             if not self.eval:
                 inputs_ids[:, -1] = self.tokenizer.eos_token_id
 
-            delimiter_indices = torch.where(inputs_ids == self.delimiter_token_id, 1, 0)
-            prompt_id_lens = torch.argmax(delimiter_indices, dim=-1)
-            prompt_id_lens = prompt_id_lens + 3
+            if self.use_reasoning_gen:
+                # In reasoning generation mode, use "Analysis" as delimiter
+                # Everything after "Analysis:" is generation target (reasoning + code)
+                if self.analysis_token_id is not None:
+                    delimiter_indices = torch.where(inputs_ids == self.analysis_token_id, 1, 0)
+                else:
+                    delimiter_indices = torch.where(inputs_ids == self.delimiter_token_id, 1, 0)
+                prompt_id_lens = torch.argmax(delimiter_indices, dim=-1)
+                prompt_id_lens = prompt_id_lens + 2  # skip "Analysis" + ":"
+            else:
+                delimiter_indices = torch.where(inputs_ids == self.delimiter_token_id, 1, 0)
+                prompt_id_lens = torch.argmax(delimiter_indices, dim=-1)
+                prompt_id_lens = prompt_id_lens + 3
 
 
             labels = inputs_ids.detach().clone()

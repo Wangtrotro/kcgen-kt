@@ -1,0 +1,12 @@
+{
+  "method": "Rule-Based Reasoning KT (Thinking-Code-KT simulation)",
+  "accuracy": 0.8067421513124035,
+  "f1": 0.527375707992448,
+  "auc": 0.678527334466684,
+  "total_predictions": 3886,
+  "positive_rate": 0.26839938239835304,
+  "misconception_extraction_rate": 1.0,
+  "misconception_categories": {
+    "other": 100
+  }
+}
