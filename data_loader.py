@@ -40,15 +40,22 @@ def get_problem_kc(kc_file):
         for key, val in kc_problem_dict.items():
             kc_cnt += len(val)
             for kc in val:
-                uniq_kcs.add(kc)
+                # Handle both formats: plain string or [description, category] list
+                kc_name = kc[0] if isinstance(kc, list) else kc
+                uniq_kcs.add(kc_name)
+
+    # Normalize the dict values to plain strings
+    normalized_dict = {}
+    for key, val in kc_problem_dict.items():
+        normalized_dict[key] = [kc[0] if isinstance(kc, list) else kc for kc in val]
 
     uniq_kcs = list(uniq_kcs)
     print('No. of KCs:', len(uniq_kcs))
-    print('Avg Kcs per problem:', kc_cnt / len(kc_problem_dict))
+    print('Avg Kcs per problem:', kc_cnt / len(normalized_dict))
  
     kc_dict_res = {uniq_kcs[i]: i for i in range(len(uniq_kcs))}
 
-    return kc_problem_dict, kc_dict_res
+    return normalized_dict, kc_dict_res
 
 
 # get baseline kc
