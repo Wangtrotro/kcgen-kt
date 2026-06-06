@@ -61,22 +61,29 @@
 
 ---
 
-## 实验分布
+## 实验分布（共 11 个实验）
 
 ```
 按研究问题分组:
 
-[KC 自动生成] ← 3 个实验
-├── Exp1: LLM Few-shot KC 生成 (正确 vs 正确+错误代码)
-├── Exp4: KC 聚类粒度消融
-└── Exp6: 代码采样策略对比
+[KC 自动生成] ← 4 个实验
+├── E1: LLM Few-shot KC 生成 (正确 vs 正确+错误代码)
+├── E4: KC 聚类粒度消融
+├── E6: 代码采样策略对比
+└── E7: Baseline KC 对比 (人工18类 vs 自动75类)
 
-[知识状态建模] ← 2 个实验
-├── Exp2: Mastery Level 嵌入策略
-└── Exp5: Transition Layer 消融
+[知识状态建模] ← 3 个实验
+├── E2: Mastery Level 嵌入策略 (True/False 加权)
+├── E5: Transition Layer 消融
+└── E8: Prompt 构造 (KC-aware 输入模板)
 
-[训练策略] ← 1 个实验
-└── Exp3: 多任务联合训练 (Generation + Prediction + KC)
+[训练策略] ← 3 个实验
+├── E3: 多任务联合训练 (Generation + Prediction + KC)
+├── E9: Predictor 架构消融 (单层 vs 多层 MLP)
+└── E10: Loss Function 消融 (BCE vs CrossEntropy)
+
+[泛化性验证] ← 1 个实验
+└── E11: 跨数据集验证 (CodeWorkout/Java vs Falcon/Python)
 ```
 
 ---

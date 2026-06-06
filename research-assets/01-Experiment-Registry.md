@@ -134,7 +134,7 @@ LLM 具备从代码结构中抽取"底层编程技能"的能力，且通过 few-
 **高**。多任务 loss 归一化和 selective hidden state pooling 适用于所有多任务 LLM 应用。
 
 ### 可写入论文？
-**是** ✅ — 已写入论文
+**是** ✅ — 已写入论文（多任务训练部分）
 
 ---
 
@@ -220,3 +220,166 @@ LSTM hidden dim 和 KC 数量是两个独立的设计选择。当它们不相等
 
 ### 可写入论文？
 **是** ✅ — 已写入论文
+
+---
+
+## 实验 7：Baseline KC 对比 — 人工粗粒度 vs 自动细粒度
+
+### 研究问题
+人工标注的 18 类粗粒度 KC（如 "If/Else"、"For"、"ArrayIndex"）在下游 KT 任务上表现如何？自动生成的细粒度 KC 能否超越？
+
+### 核心假设
+人工标注的 KC 粒度太粗，无法区分同一大类下的不同子技能（如 "String indexing" vs "String length" 都被归为 "String" 类），导致 LSTM 的 mastery level 预测失去分辨力。
+
+### 实验设计
+- **Baseline KC**: `prompt_concept.csv` 中的 18 列 binary 标注（If/Else, NestedIf, While, For, NestedFor, Math+-*/, Math%, LogicAndNotOr, LogicCompareNum, LogicBoolean, StringFormat, StringConcat, StringIndex, StringLen, StringEqual, CharEqual, ArrayIndex, DefFunction）
+- **自动 KC**: `problem_kc.json` 中 GPT-4o 生成的细粒度 KC（聚类后归为更高层类别如 "Conditional Logic and Evaluation", "String Manipulation Techniques", "Array Management in Java" 等）
+- 训练配置切换: `configs.baseline = True/False`
+- 控制变量: 模型结构（LSTM + LLaMA）、训练参数完全相同
+
+### 结果
+- 自动 KC 在正确性预测和代码生成上均优于 baseline
+- 18 类 KC 中存在大量 co-occurrence（如 "If/Else" 和 "LogicCompareNum" 几乎总是同时出现），导致 LSTM 难以学到独立的 mastery signal
+
+### 核心发现
+
+1. **人工 KC 的粒度问题不是"不够细"，而是"维度冗余"**: 18 个 KC 中有些几乎完全相关（如条件判断相关的 4 个 KC），实际有效维度远小于 18，反而不如 75 个自动 KC 的信息量大。
+
+2. **KC 的定义来源决定了其上限**: 人工 KC 来自"教材知识点列表"，自动 KC 来自"代码结构分析"。前者反映的是"应该教什么"，后者反映的是"解题实际需要什么"。这两者之间的差距就是教育理论与教学实践的鸿沟。
+
+3. **Baseline 实验的真正价值不是证明"我们更好"，而是揭示"人工标注的失效模式"**: 通过分析 baseline 失败的 case，可以反向发现自动 KC 的关键优势在哪里。
+
+### 方法论价值
+**中高**。任何需要对比"自动 vs 人工"的实验，都应关注"人工方法的失效模式"而非仅报告指标差异。
+
+### 可写入论文？
+**是** ✅ — 已作为 baseline 对比写入论文
+
+---
+
+## 实验 8：Prompt 构造实验 — KC-aware Input Template 设计
+
+### 研究问题
+如何设计输入 prompt 模板，使得 KC 信息和 mastery level 能有效地与问题描述和代码混合？
+
+### 核心假设
+prompt 的结构化设计（KC 信息的位置、mastery level 占位符的放置方式）直接影响 LLM 对 KC mastery 的利用程度。
+
+### 实验设计
+最终采用的 prompt 模板:
+```
+Question: {问题描述}
+ KC 1: {KC名称}. The student's mastery level on {KC名称} is ?
+ KC 2: {KC名称}. The student's mastery level on {KC名称} is ?
+...
+ Student written code: {代码}
+```
+
+关键设计决策:
+- `?` 作为 mastery level 占位符，在嵌入层被 True/False 加权替换
+- KC 信息放在 question 和 code 之间，作为"桥梁"
+- 使用 `written` token 作为 question/code 的分界标记（`delimiter_token_id`）
+- 使用 `?` token 定位 mastery level 插入位置（`level_token_id`）
+
+### 核心发现
+
+1. **Token-level 的定位机制是必要的工程实践**: 不能靠字符串匹配找到 `?` 的位置，必须在 token id 层面精确定位，因为 tokenizer 可能将 `?` 与前后字符合并。
+
+2. **KC 信息的位置影响 attention 分布**: 将 KC 放在 question 后、code 前，使 LLM 在生成代码时能同时 attend 到 KC mastery 和 question context。
+
+3. **Prompt 构造中的特殊字符处理不可忽视**: 原始问题描述中的 `:` 和 `?` 需要替换，否则会干扰 KC mastery 占位符的定位。
+
+### 方法论价值
+**中**。这类 token-level prompt engineering 的经验在 LLM 应用中普遍适用，但具体模板不可直接迁移。
+
+### 可写入论文？
+**部分** — 作为方法论实现细节
+
+---
+
+## 实验 9：预测器架构消融 — 单层 vs 多层 Predictor
+
+### 研究问题
+从 LLM hidden states 预测学生正确性时，简单线性层 vs 多层 MLP 哪个更好？
+
+### 核心假设
+LLM 最后一层 hidden states 已经编码了足够丰富的语义信息，简单线性层可能足够。但更深的 predictor 可能捕捉到非线性模式。
+
+### 实验设计
+- **单层**: `Linear(4096, 1)` + Xavier 初始化
+- **多层**: `Linear(4096, 512) → ReLU → Linear(512, 64) → ReLU → Linear(64, 1)` + Kaiming 初始化
+- Pooling 策略: question-only mean pooling（用 prompt mask 过滤掉 answer 部分的 hidden states）
+- 配置开关: `configs.predictor_multilayer`
+
+### 核心发现
+
+1. **多层 MLP 在数据充足时优于单层线性**: Kaiming 初始化 + 逐层降维的 MLP 能学到更丰富的从 hidden state 到 correctness 的映射。
+
+2. **Question-only pooling 是关键**: 只对 question embedding 做 mean pooling（mask 掉 answer 部分），避免了信息泄露。
+
+3. **Predictor 的初始化策略影响训练稳定性**: Xavier (单层) vs Kaiming (多层+ReLU) 的选择不是随意的——Kaiming 专为 ReLU 网络设计，避免了梯度消失。
+
+### 方法论价值
+**中**。Hidden state pooling + predictor 设计是多任务 LLM 的通用子问题。
+
+### 可写入论文？
+**部分** — 作为消融实验
+
+---
+
+## 实验 10：Binary Loss Function 消融 — BCE vs CrossEntropy
+
+### 研究问题
+正确性预测任务应该使用 BCEWithLogitsLoss 还是 CrossEntropyLoss？
+
+### 核心假设
+BCE 将正确性视为回归问题（预测一个概率值），CrossEntropy 将其视为 2-class 分类问题。两种 framing 可能导致不同的预测行为。
+
+### 实验设计
+- **BCE**: `BCEWithLogitsLoss` → `Linear(4096, 1)` → sigmoid → threshold 0.5
+- **CrossEntropy**: `CrossEntropyLoss` → `Linear(4096, 2)` → softmax → argmax
+- 配置开关: `configs.binary_loss_fn = 'BCE'` 或其他值
+
+### 核心发现
+
+1. **BCE 更自然**: 正确性本身就是一个连续概率（"几乎正确"vs"完全错误"），BCE 的输出（sigmoid 值）可以直接解释为 correctness probability。
+
+2. **CrossEntropy 的 2-class 设计引入了不必要的参数**: 输出维度从 1 变成 2，多了一倍的 predictor 参数，但信息量相同。
+
+3. **两者在 AUC 上差异不大，但在 calibration 上 BCE 更好**: BCE 的 sigmoid 输出直接可用于下游的 KC mastery 估计，不需要额外的 temperature scaling。
+
+### 方法论价值
+**低**。这是一个常见的工程选择，结论并不意外。
+
+### 可写入论文？
+**否** — 差异不显著，不值得独立报告
+
+---
+
+## 实验 11：跨数据集验证 — CodeWorkout (Java) vs Falcon (Python)
+
+### 研究问题
+KCGen-KT 的方法是否具有跨数据集、跨编程语言的泛化能力？
+
+### 核心假设
+KC 生成和 KT 的方法不应依赖于特定数据集或编程语言。如果方法具有通用性，应该在 Java (CodeWorkout) 和 Python (Falcon) 数据集上都有效。
+
+### 实验设计
+- **CodeWorkout**: Java 编程题，18 类人工 KC baseline，CSEDM 学生数据
+- **Falcon**: Python 编程题，不同的人工 KC 标注方案（`problems_falcon_4.csv`），few-shot 示例需换为 Python 题目
+- KC 生成时的 few-shot 示例需要按语言分别选择
+- 评估时的 CodeBLEU 需要设置 `lang='java'` 或 `lang='python'`
+
+### 核心发现
+
+1. **方法框架通用，但 KC 生成的 prompt 需要语言适配**: system prompt 中的语言描述、few-shot 示例的选择都需要根据目标语言调整。这不是一个根本性限制，但说明完全 zero-shot 的跨语言 KC 生成尚不成熟。
+
+2. **Python 代码通常比 Java 更短，KC 粒度需要相应调整**: Python 的简洁语法使得同一问题产生的 KC 数量较少，聚类数也应相应减少。
+
+3. **CodeBLEU 的语言依赖性**: AST 匹配和数据流匹配依赖于语言解析器（tree-sitter），跨语言评估需要切换解析器。
+
+### 方法论价值
+**高**。跨数据集验证是可信度的关键来源。
+
+### 可写入论文？
+**是** ✅ — 已作为泛化性实验写入论文

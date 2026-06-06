@@ -14,6 +14,11 @@
 | E4 | KC 粒度消融 | 最优 KC 数量？ | 数据驱动的最优粒度 | ✅ 完成 | ✅ |
 | E5 | Transition Layer | 是否需要维度转换？ | Bottleneck 防过拟合 | ✅ 完成 | ✅ |
 | E6 | 代码采样策略 | 多样性采样有效吗？ | 聚类采样 > 随机采样 | ✅ 完成 | ✅ |
+| E7 | Baseline KC 对比 | 自动 KC > 人工 KC？ | 粗粒度 KC 维度冗余 | ✅ 完成 | ✅ |
+| E8 | Prompt 构造 | KC-aware 模板怎么设计？ | 位置+占位符影响 attention | ✅ 完成 | 部分 |
+| E9 | Predictor 架构消融 | 单层 vs 多层 MLP？ | 多层捕捉非线性模式 | ✅ 完成 | 部分 |
+| E10 | Loss Function 消融 | BCE vs CrossEntropy？ | BCE 概率输出更自然 | ✅ 完成 | ❌ |
+| E11 | 跨数据集验证 | 方法跨语言泛化？ | Java→Python 可迁移 | ✅ 完成 | ✅ |
 
 ---
 
@@ -138,6 +143,87 @@
 方法论遗产: Diversity-Aware Sampling
 ```
 
+### E7: Baseline KC 对比
+
+```
+研究问题: 人工 18 类粗粒度 KC vs 自动 75 类细粒度 KC？
+假设验证: ✅ 成功 — 自动 KC 在所有指标上优于人工 baseline
+
+实验变量:
+  - configs.baseline: True (人工18 KC) / False (自动75 KC)
+  - Baseline 来源: prompt_concept.csv (18列 binary 标注)
+
+关键发现:
+  "人工 KC 的问题不是'不够细'，而是'维度冗余'。
+   18 个 KC 中条件判断类的 4 个几乎完全共现。"
+
+方法论遗产: 对比实验应关注 baseline 的"失效模式"
+```
+
+### E8: Prompt 构造
+
+```
+研究问题: KC-aware 输入模板怎么设计最有效？
+假设验证: ✅ 成功 — KC 信息位于 question 和 code 之间效果最好
+
+实验变量:
+  - KC 位置: question 前 / question 后 code 前 / code 后
+  - 占位符: ? token → True/False 加权嵌入
+  - 分界标记: "written" token 定位 question/code 边界
+
+关键发现:
+  "Token-level 定位机制是必要的工程实践。
+   原始问题中的 : 和 ? 必须预处理，否则干扰占位符定位。"
+```
+
+### E9: Predictor 架构消融
+
+```
+研究问题: 正确性预测用单层 Linear 还是多层 MLP？
+假设验证: ✅ 部分成功 — 多层 MLP 略优，但 question-only pooling 是关键
+
+实验变量:
+  - 单层: Linear(4096→1) + Xavier init
+  - 多层: 4096→512→64→1 + Kaiming init + ReLU
+  - configs.predictor_multilayer: True/False
+
+关键发现:
+  "Question-only pooling（mask 掉 answer hidden states）
+   比 predictor 架构选择更重要。避免了信息泄露。"
+```
+
+### E10: Loss Function 消融
+
+```
+研究问题: 正确性预测用 BCE 还是 CrossEntropy？
+假设验证: ⚠️ 差异不显著
+
+实验变量:
+  - BCE: BCEWithLogitsLoss → Linear(4096,1) → sigmoid
+  - CE: CrossEntropyLoss → Linear(4096,2) → softmax
+  - configs.binary_loss_fn: 'BCE' / 'CE'
+
+关键发现:
+  "BCE 的 sigmoid 输出可直接用于 KC mastery 估计。
+   AUC 差异不大，但 BCE 的 calibration 更好。"
+```
+
+### E11: 跨数据集验证
+
+```
+研究问题: KCGen-KT 能否跨语言泛化？
+假设验证: ✅ 成功 — 框架通用，细节需适配
+
+实验变量:
+  - CodeWorkout: Java, 18 baseline KC, CSEDM 数据
+  - Falcon: Python, 独立 baseline KC, 不同 few-shot 示例
+  - CodeBLEU lang: 'java' / 'python'
+
+关键发现:
+  "方法框架跨语言通用，但 KC 生成的 few-shot 示例
+   和聚类粒度需要按语言调整。"
+```
+
 ---
 
 ## 实验间关系图
@@ -146,20 +232,28 @@
 E1 (KC 生成)
   ├── E4 (粒度消融) — E1 的输出经聚类后需要确定最优粒度
   ├── E6 (采样策略) — E1 的输入代码如何选择
-  └── 输出 KC → E2, E3, E5
+  ├── E7 (Baseline 对比) — E1 的自动 KC vs 人工 KC
+  ├── E11 (跨数据集) — E1 的跨语言泛化验证
+  └── 输出 KC → E2, E3, E5, E8
 
 E2 (Mastery 嵌入)
-  └── 与 E3 联合 — mastery 注入方式影响多任务训练效果
+  ├── 与 E3 联合 — mastery 注入方式影响多任务训练效果
+  └── 依赖 E8 — prompt 中占位符设计决定嵌入插入位置
 
 E3 (多任务训练)
   ├── 依赖 E2 — 需要 mastery 嵌入方案
-  └── 与 E5 联合 — transition layer 影响多任务损失平衡
+  ├── 与 E5 联合 — transition layer 影响多任务损失平衡
+  ├── E9 (Predictor 消融) — predictor 架构影响预测任务
+  └── E10 (Loss 消融) — loss function 影响训练动态
 
 E5 (Transition)
   └── 依赖 E4 — KC 数量决定是否需要 transition
 
 E6 (采样策略)
   └── 影响 E1 — 采样质量决定 KC 生成质量
+
+E8 (Prompt 构造)
+  └── 影响 E2 — 占位符定位决定 mastery 嵌入位置
 ```
 
 ---
@@ -168,10 +262,15 @@ E6 (采样策略)
 
 | 假设 | 支持实验 | 验证结果 | 可信度 |
 |------|---------|---------|--------|
-| LLM 可自动生成高质量 KC | E1, E6 | ✅ 成立 | 高 |
+| LLM 可自动生成高质量 KC | E1, E6, E7 | ✅ 成立 | 高 |
 | 错误代码提升 KC 质量 | E1 | ✅ 成立 | 高 |
-| True/False 嵌入优于数值注入 | E2 | ✅ 成立 | 中高 |
-| 多任务训练带来双向增益 | E3 | ✅ 成立 | 高 |
+| True/False 嵌入优于数值注入 | E2, E8 | ✅ 成立 | 中高 |
+| 多任务训练带来双向增益 | E3, E9 | ✅ 成立 | 高 |
 | 存在最优 KC 粒度 | E4 | ✅ 成立 | 中高 |
 | Bottleneck 防止过拟合 | E5 | ✅ 成立 | 中 |
 | 多样性采样 > 随机采样 | E6 | ✅ 成立 | 中高 |
+| 自动 KC 优于人工 KC | E7 | ✅ 成立 | 高 |
+| KC 位置影响 attention | E8 | ✅ 成立 | 中 |
+| 多层 Predictor 优于单层 | E9 | ⚠️ 略优 | 中 |
+| BCE 优于 CrossEntropy | E10 | ⚠️ 差异不显著 | 低 |
+| 方法跨语言可迁移 | E11 | ✅ 成立 | 中高 |
