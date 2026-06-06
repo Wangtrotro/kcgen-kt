@@ -87,14 +87,16 @@ def categorize_misconception(misconception_text: str) -> str:
     text = misconception_text.lower()
     
     categories = {
-        "boundary_error": ["off-by-one", "bounds", "boundary", "index", "out of range"],
+        "boundary_error": ["off-by-one", "bounds", "boundary", "index", "out of range", "arrayindex"],
         "missing_case": ["base case", "edge case", "missing", "empty", "null"],
-        "logic_error": ["comparison", "operator", "condition", "logic", "precedence"],
-        "loop_error": ["loop", "infinite", "iteration", "termination"],
-        "type_error": ["type", "cast", "conversion", "string.*=="],
-        "recursion_error": ["recursive", "recursion", "stack overflow"],
+        "logic_error": ["comparison", "operator", "condition", "logic", "precedence",
+                       "if/else", "nestedif", "logicand", "logiccompare", "logicboolean"],
+        "loop_error": ["loop", "infinite", "iteration", "termination", "while", "for", "nestedfor"],
+        "type_error": ["type", "cast", "conversion", "string.*==", "charequal", "stringequal"],
+        "string_error": ["string", "stringformat", "stringconcat", "stringindex", "stringlen"],
+        "recursion_error": ["recursive", "recursion", "stack overflow", "deffunction"],
         "initialization_error": ["initial", "variable", "declaration", "scope"],
-        "return_error": ["return", "output", "result"],
+        "math_error": ["math", "arithmetic", "math%", "math+-"],
     }
     
     for category, keywords in categories.items():

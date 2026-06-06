@@ -1,0 +1,10 @@
+{
+  "total_evaluated": 8306,
+  "prediction_accuracy": 0.7625812665542981,
+  "misconception_extraction_rate": 1.0,
+  "misconception_categories": {
+    "logic_error": 6513,
+    "loop_error": 1786,
+    "boundary_error": 7
+  }
+}
