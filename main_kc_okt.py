@@ -1,6 +1,7 @@
 import os
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
+import json
 from omegaconf import OmegaConf
 from datetime import datetime
 import hydra
@@ -45,6 +46,13 @@ def main(configs):
     else:
         kc_problem_dict, kc_no_dict = get_problem_kc(configs.kc_path)  
 
+    # Load reasoning traces if configured
+    reasoning_traces = None
+    if configs.use_reasoning and configs.reasoning_traces_path:
+        print(f"Loading reasoning traces from: {configs.reasoning_traces_path}")
+        with open(configs.reasoning_traces_path, 'r', encoding='utf-8') as f:
+            reasoning_traces = json.load(f)
+        print(f"  Loaded traces for {len(reasoning_traces)} students")
 
     ## load the init dataset
     train_stu, valid_stu, test_stu, df, students = read_data('data/dataset_time.pkl', kc_problem_dict, configs)
@@ -76,9 +84,9 @@ def main(configs):
         configs.epochs = 1
 
 
-    train_loader = make_dataloader(train_stu, df, collate_fn, configs)
-    valid_loader = make_dataloader(valid_stu, df, collate_fn, configs)
-    test_loader = make_dataloader(test_stu, df, collate_fn, configs)
+    train_loader = make_dataloader(train_stu, df, collate_fn, configs, reasoning_traces=reasoning_traces)
+    valid_loader = make_dataloader(valid_stu, df, collate_fn, configs, reasoning_traces=reasoning_traces)
+    test_loader = make_dataloader(test_stu, df, collate_fn, configs, reasoning_traces=reasoning_traces)
 
 
     # optimizater and loss function

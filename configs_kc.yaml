@@ -68,3 +68,12 @@ k: 1
 p: 0
 max_new_tokens: 400
 change_generation_length: false
+##################################################
+# reasoning configs
+##################################################
+use_reasoning: false
+reasoning_traces_path: ''
+reasoning_loss_weight: 0.3
+thinking_budget: 1024
+reasoning_mode: 'trained'  # 'trained' or 'training_free'
+predictor_multilayer: false
