@@ -266,3 +266,276 @@
 24. CodeWorkout: https://codeworkout.cs.vt.edu/ (413 students, 69K interactions, Java)
 25. CSEDM Data Challenge: https://sites.google.com/ncsu.edu/csedm-dc-2021/dataset
 26. Pencil Code: https://github.com/meghabyte/pencilcode-public (3.8M traces)
+
+---
+
+## 六、基于 KCGen-KT 项目的论文故事线设计
+
+### 项目回顾：KCGen-KT 做了什么
+
+KCGen-KT (arXiv:2502.18632) 的核心贡献：
+1. **KC自动生成**：GPT-4o few-shot → 多样性采样 → SentenceBERT聚类 → GPT-4o摘要 → 50个中粒度KC
+2. **Soft Token注入**：将KC mastery以可微分的soft token形式注入Llama-3提示
+3. **多任务学习**：同时预测正确性 + 生成代码
+4. **核心发现**：LLM生成的KC显著优于人工标注的KC
+
+### KCGen-KT 现有局限（即你的下一篇论文的motivation）
+
+| 局限 | 描述 |
+|------|------|
+| KC生成是静态的 | KC一次性生成后固定，无法根据学生表现自适应调整 |
+| KC粒度控制靠启发式 | 聚类数目(50/60)是超参数，缺乏理论指导 |
+| 不理解"为什么错" | 只追踪mastery分数，不建模学生的misconception |
+| 代码表征是浅层的 | ASTNN 200-dim + LLM 4096-dim拼接，缺少执行语义 |
+| 缺少推理过程 | 模型直接预测，不解释为什么认为学生会对/错 |
+| 数据规模受限 | CodeWorkout仅246学生，10K交互 |
+
+---
+
+## 故事线方案一（最推荐）：Reasoning-Grounded KCGen-KT
+
+### 标题方向
+**"From Knowledge Components to Knowledge Reasoning: Execution-Grounded Reasoning for Interpretable Programming Knowledge Tracing"**
+
+或中文：基于执行推理的可解释编程知识追踪
+
+### 故事逻辑
+
+```
+[Problem] KCGen-KT生成了好的KC，但KT过程是"黑盒"的
+     ↓ 缺什么？
+[Gap] 模型知道学生mastery=0.3，但不知道为什么=0.3
+     ↓ 怎么解决？
+[Method] 引入Reasoning Module：让模型在预测前先"推理"
+     ↓ 关键创新点
+[Innovation] 推理过程可以通过代码执行来验证（execution-grounded）
+     ↓ 效果
+[Results] 更准确的KT + 可解释的诊断 + 个性化反馈生成
+```
+
+### 具体方法设计
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│              Reasoning-KCGen-KT Architecture                  │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  [Stage 1: KC-Aware Reasoning Prompt]                        │
+│  ┌──────────────────────────────────────────┐               │
+│  │ Student history: {problems, codes, scores} │               │
+│  │ Current KCs: {kc1: mastery_1, ...}        │               │
+│  │ Next problem: {...}                        │               │
+│  │                                            │               │
+│  │ REASONING TEMPLATE:                        │               │
+│  │ 1. 分析学生在每个KC上的表现模式            │               │
+│  │ 2. 识别可能的misconception                 │               │
+│  │ 3. 模拟学生可能写出的代码逻辑              │               │
+│  │ 4. 预测代码在各test case上的表现           │               │
+│  │ 5. 给出最终预测和诊断                      │               │
+│  └──────────────────────────────────────────┘               │
+│                                                              │
+│  [Stage 2: Execution Verification]                           │
+│  - 模型推理出的"学生可能犯的错" 可以通过                    │
+│    实际执行test case来验证                                   │
+│  - 形成self-verification loop                                │
+│                                                              │
+│  [Stage 3: Reasoning-Enhanced Mastery Update]                │
+│  - 推理结论反馈到LSTM的mastery更新                           │
+│  - 不再是纯数值更新，而是有语义支撑的更新                   │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### 为什么这个故事讲得圆
+
+1. **自然承接KCGen-KT**：你已经有了KC生成和soft token注入，下一步自然是"让模型理解KC"
+2. **连接Code Reasoning大趋势**：2026年最热门方向
+3. **连接Thinking-KT**：但你做的是CODE-SPECIFIC reasoning（有execution verification），比Thinking-KT的generic reasoning更有针对性
+4. **保持可验证性**：编程的独特优势——推理可以通过执行来验证
+5. **解决实际痛点**：教育场景需要可解释的诊断，不只是一个分数
+
+### 实验设计
+
+| 实验 | 验证什么 |
+|------|----------|
+| KCGen-KT vs. Reasoning-KCGen-KT | 推理是否提升KT准确率 |
+| Generic Reasoning vs. Code-Specific Reasoning | 编程专用推理模板是否优于通用模板 |
+| With/Without Execution Verification | 执行验证是否提升推理质量 |
+| Reasoning Trace Analysis | 模型是否真正识别了student misconception |
+| Thinking Budget Ablation | 推理长度对性能的影响 |
+| Generated Feedback Quality | 推理过程是否产生更好的个性化反馈 |
+
+### 承接关系图
+
+```
+KCGen-KT (你的已发表工作)
+    ↓ "KC生成好了，但KT不够智能"
+Thinking-KT (ACL ARR 2026, 别人的工作)
+    ↓ "证明了TTS对KT有效，但没考虑代码特殊性"
+你的新工作: Reasoning-KCGen-KT
+    = KCGen-KT的KC表示 + Thinking-KT的TTS思想 + Code执行验证(你的创新)
+```
+
+---
+
+## 故事线方案二：Adaptive KC Evolution with Feedback Loop
+
+### 标题方向
+**"Self-Evolving Knowledge Components: Closing the Loop Between KC Generation and Knowledge Tracing in Programming Education"**
+
+### 故事逻辑
+
+```
+[Problem] KCGen-KT的KC是静态的，生成一次后固定不变
+     ↓
+[Observation] 不同学生群体需要不同粒度/类型的KC
+     ↓
+[Gap] KC生成和KT是割裂的两个阶段，没有反馈闭环
+     ↓
+[Method] 让KT的表现反馈回KC生成，形成迭代优化
+     ↓
+[Innovation] KT-guided KC refinement：
+     - KT性能差的KC → 需要细分
+     - KT性能好但区分度低的KC → 可以合并
+     - 学生频繁混淆的概念 → 需要新KC
+```
+
+### 具体方法
+
+```
+┌─────────────────────────────────────────────────────────┐
+│            Self-Evolving KCGen-KT                        │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  [Cycle 1]                                              │
+│  KC Generation (GPT-4o) → KCGen-KT Training → Eval     │
+│       ↑                                          │      │
+│       │         ← Feedback Signal ←              │      │
+│       │                                          ↓      │
+│  [Cycle 2]                                              │
+│  KC Refinement:                                         │
+│  - 分析哪些KC的mastery预测误差最大                      │
+│  - 识别被频繁混淆的KC pairs                             │
+│  - 生成refinement prompt给GPT-4o                        │
+│  - 重新聚类/分裂/合并KC                                 │
+│       ↓                                                 │
+│  Updated KCs → Re-train → Eval → ...                    │
+│                                                         │
+│  [Stop Criterion]                                       │
+│  - KT performance converges                             │
+│  - KC数量稳定                                           │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 为什么这个故事讲得圆
+
+1. **直接解决KCGen-KT的核心局限**：静态KC → 动态KC
+2. **连接LPReKL的闭环思想**：KT和LLM的双向交互
+3. **有Education理论支撑**：KC理论本身强调"right grain size"
+4. **实验自然对比**：1次生成 vs. N次迭代的消融实验
+5. **可以讲增量贡献**：每一轮KC进化带来多少性能提升
+
+---
+
+## 故事线方案三：Process-Level KCGen-KT
+
+### 标题方向
+**"Beyond Final Submissions: Process-Aware Knowledge Component Generation and Tracing for Programming Education"**
+
+### 故事逻辑
+
+```
+[Problem] KCGen-KT只看最终正确代码生成KC
+     ↓
+[Observation] 学生的代码编辑过程包含丰富的learning signal
+     ↓
+[Gap] 从"正确答案"生成的KC无法描述"常见错误模式"
+     ↓
+[Method] 从编辑过程(process)中生成KC
+     - 错误代码→正确代码的diff中蕴含misconception
+     - 多次提交的演变反映知识获取过程
+     ↓
+[Innovation] Process-KC：描述"学生容易犯什么错"的KC
+     + Process-Level KT：追踪学生是否克服了特定misconception
+```
+
+### 具体方法
+
+```
+Phase 1: Process-Aware KC Generation
+- 输入: (错误代码, 正确代码, diff) pairs
+- LLM分析: "这个错误反映了什么misconception?"
+- 聚类: 生成Misconception-KCs (M-KCs)
+- 结果: 每个problem有两类KC
+  - Skill-KCs (from correct solutions, 原KCGen)
+  - Misconception-KCs (from error patterns, 新增)
+
+Phase 2: Dual-Track KT
+- Skill Mastery Track: 追踪正向技能掌握 (原有)
+- Misconception Track: 追踪错误概念是否被克服 (新增)
+- 融合: 综合两个track预测下一次表现
+```
+
+### 为什么这个故事讲得圆
+
+1. **解决KCGen-KT"只看正确答案"的局限**
+2. **连接Pencil Code Traces (2025)的过程建模思想**
+3. **连接TIKTOC的test-case级别细粒度建模**
+4. **教育意义明确**：misconception detection是tutoring系统的核心需求
+5. **数据利用率高**：CodeWorkout本身就包含错误提交，现在被浪费了
+
+### 关键发现可以预期
+- KCGen-KT原论文发现"包含错误代码生成KC会hurt performance"
+- 但那是因为把error和skill混在一起了
+- 分开建模(dual-track)应该能解决这个问题 → 这就是你的contribution
+
+---
+
+## 故事线方案四：Multi-Granularity Reasoning KCGen
+
+### 标题方向
+**"Hierarchical Knowledge Reasoning for Programming Knowledge Tracing: From Atomic Operations to Algorithmic Thinking"**
+
+### 故事逻辑
+
+```
+[Problem] KCGen-KT用固定粒度的KC (50个cluster)
+     ↓
+[Observation] 编程知识天然是分层的:
+     - 语法层: for循环, if语句
+     - 操作层: 数组遍历, 字符串操作
+     - 算法层: 分治, 动态规划
+     - 思维层: 问题分解, 边界处理
+     ↓
+[Gap] 单一粒度的KC无法刻画这种层次结构
+     ↓
+[Method] 层次化KC + 层次化推理
+     - 自底向上: 语法掌握 → 操作能力 → 算法理解
+     - 诊断时自顶向下: 算法不行 → 哪个操作不行 → 具体语法问题
+```
+
+### 为什么讲得圆
+
+1. 直接扩展KCGen-KT的聚类层次（现在是flat的50个KC）
+2. 连接知识图谱方向（KGNN-KT的层次结构思想）
+3. 连接Code Reasoning的"从简单到复杂推理"
+4. 教育学理论支撑（Bloom's taxonomy层次）
+
+---
+
+## 综合推荐
+
+| 方案 | 创新性 | 可行性 | 故事连贯性 | 预期venue |
+|------|--------|--------|------------|-----------|
+| **方案一: Reasoning-KCGen-KT** | ★★★★ | ★★★★ | ★★★★★ | ACL/EMNLP/NeurIPS |
+| 方案二: Self-Evolving KC | ★★★ | ★★★★★ | ★★★★ | AAAI/IJCAI |
+| **方案三: Process-Level KCGen** | ★★★★ | ★★★★ | ★★★★ | EDM/LAK/KDD |
+| 方案四: Hierarchical KC | ★★★ | ★★★ | ★★★ | CIKM/ECML |
+
+### 最终推荐：方案一（Reasoning）或方案三（Process-Level）
+
+- **方案一**适合投NLP/AI顶会：因为连接了reasoning大趋势
+- **方案三**适合投教育数据挖掘/应用场景：因为直接解决KCGen-KT原文的遗留问题（错误代码hurt KC质量）
+
+如果时间和精力允许，**方案一+三的组合**（Process-Aware Reasoning KCGen-KT）可以同时解决"不理解错误"和"不会推理"两个问题，冲击最高venue。
