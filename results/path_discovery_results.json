@@ -1,0 +1,270 @@
+{
+  "13": {
+    "prompt": "Write a function in Java that implements the following logic: You are driving a little too fast, and a police officer st",
+    "total_correct": 261,
+    "unique_solutions": 232,
+    "best_k": 2,
+    "silhouette": 0.45717331767082214,
+    "silhouette_by_k": {
+      "2": 0.45717331767082214,
+      "3": 0.3154728412628174,
+      "4": 0.32924312353134155,
+      "5": 0.34635448455810547,
+      "6": 0.3618273437023163,
+      "7": 0.3033733367919922
+    },
+    "cluster_sizes": {
+      "0": 207,
+      "1": 25
+    },
+    "representatives": {
+      "0": "public int caughtSpeeding(int speed, boolean isBirthday)\r\n{\r\n\tif (isBirthday) {\r\n        if (speed <= 65)\r\n            return 0;\r\n        else if (speed <= 85 && speed >= 66)\r\n            return 1;\r\n        else \r\n            return 2;\r\n\t}\r\n    else {\r\n        if (speed <= 60)\r\n            return 0;",
+      "1": "public int caughtSpeeding(int speed, boolean isBirthday)\r\n{\r\n    int ticket = 0;\r\n    if (isBirthday == false)\r\n    {\r\n    if (speed <= 60)\r\n    {\r\n     \tticket = 0;   \r\n    }\r\n    else if (speed >= 61 && speed <= 80)\r\n    {\r\n        ticket = 1;\r\n    }\r\n    else if (speed >= 81)\r\n    {\r\n     \tticket"
+    }
+  },
+  "31": {
+    "prompt": "Write a function in Java that implements the following logic: Given a string and an int n, return a string made of n rep",
+    "total_correct": 256,
+    "unique_solutions": 197,
+    "best_k": 6,
+    "silhouette": 0.2939261794090271,
+    "silhouette_by_k": {
+      "2": 0.17949385941028595,
+      "3": 0.24511273205280304,
+      "4": 0.2789815664291382,
+      "5": 0.2746504247188568,
+      "6": 0.2939261794090271,
+      "7": 0.2822538912296295
+    },
+    "cluster_sizes": {
+      "2": 92,
+      "4": 31,
+      "0": 41,
+      "5": 18,
+      "3": 8,
+      "1": 7
+    },
+    "representatives": {
+      "0": "public String repeatEnd(String str, int n)\r\n{\r\n  \tStringBuilder stbuild = new  StringBuilder(n*n);\r\n    String last = str.substring(str.length() - n);\r\n    for(int i = 0; i<n; i++)\r\n        stbuild.append(last);\r\n    return stbuild.toString();\r\n}\r\n",
+      "1": "public String repeatEnd(String str, int n)\r\n{\r\n    int len = str.length();\r\n    String nStr = \"\";\r\n    for (int i = 0; i < n; i++)\r\n    {\r\n        nStr += str.substring(len - n, len);\r\n    }\r\n    return nStr;\r\n}\r\n",
+      "2": "public String repeatEnd(String str, int n)\r\n{\r\n    String end = \"\";\r\n    for(int i = 0; i < n; i++)\r\n    {\r\n     end = end + str.substring((str.length() - n), str.length());   \r\n    }\r\n            return end;\r\n}\r\n",
+      "3": "public String repeatEnd(String str, int n)\r\n{\r\nint l = str.length();\r\nString banana = \r\n(str.substring(str.length()-n));\r\nfor(int i=1;i<n;i++)\r\nbanana= (banana) + str.substring(str.length()-n);\r\nreturn banana;\r\n}\r\n",
+      "4": "public String repeatEnd(String str, int n)\r\n{\r\n    String newstring = \"\";\r\n    String end = str.substring(str.length() - n);\r\n    for (int i = 0; i < n; i++)\r\n    {\r\n        newstring = newstring + end;\r\n    }\r\n    return newstring;\r\n}\r\n",
+      "5": "public String repeatEnd(String str, int n) {\r\n  int len = str.length();\r\n  String newWord = \"\";\r\n  \r\n  for (int i = 0; i < n; i++) {\r\n    newWord += str.substring(len - n, len);\r\n  }\r\n  return newWord;\r\n}\r\n"
+    }
+  },
+  "236": {
+    "prompt": "You have a green lottery ticket, with ints a, b, and c on it. If the numbers are all different from each other, the resu",
+    "total_correct": 247,
+    "unique_solutions": 208,
+    "best_k": 3,
+    "silhouette": 0.37170717120170593,
+    "silhouette_by_k": {
+      "2": 0.36299946904182434,
+      "3": 0.37170717120170593,
+      "4": 0.26266413927078247,
+      "5": 0.24087396264076233,
+      "6": 0.2803727984428406,
+      "7": 0.27673694491386414
+    },
+    "cluster_sizes": {
+      "2": 62,
+      "1": 6,
+      "0": 140
+    },
+    "representatives": {
+      "0": "public int greenTicket(int a, int b, int c)\r\n{\r\n    if (a == b && b == c)\r\n    {\r\n        \r\n        return 20;\r\n        \r\n        \r\n    }\r\n    \r\n    \r\n    else if ( a == b || a == c || b == c)\r\n    {\r\n        \r\n        return 10;\r\n        \r\n        \r\n    }\r\n    \r\n    else\r\n    return 0;\r\n    \r\n    \r",
+      "1": "public int greenTicket(int a, int b, int c)\r\n{\r\n    int ticket = 0;\r\n    if (a != b && b != c && a != c)\r\n    {\r\n     \tticket = 0;   \r\n    }\r\n    else if (a == b && b == c)\r\n    {\r\n     \tticket = 20;   \r\n    }\r\n    else if (a == b || a == c || b == c)\r\n    {\r\n     \tticket = 10;   \r\n    }\r\n    return",
+      "2": "public int greenTicket(int a, int b, int c)\r\n{\r\n    if(a==b && b==c)\r\n    {\r\n        return 20;\r\n    }\r\n    else if (a!=b && b!=c && a!=c)\r\n    {\r\n     \treturn 0;\r\n    }\r\n    else\r\n    {\r\n     \treturn 10;   \r\n    }\r\n}\r\n"
+    }
+  },
+  "232": {
+    "prompt": "Given a day of the week encoded as 0 = Sun, 1 = Mon, 2 = Tue, ... 6 = Sat, and a boolean indicating if we are on vacatio",
+    "total_correct": 246,
+    "unique_solutions": 221,
+    "best_k": 2,
+    "silhouette": 0.4694676101207733,
+    "silhouette_by_k": {
+      "2": 0.4694676101207733,
+      "3": 0.2340228259563446,
+      "4": 0.27061253786087036,
+      "5": 0.25340473651885986,
+      "6": 0.2132674902677536,
+      "7": 0.2870532274246216
+    },
+    "cluster_sizes": {
+      "1": 199,
+      "0": 22
+    },
+    "representatives": {
+      "0": "public String alarmClock(int day, boolean vacation)\r\n{\r\n    String alarm = \"\";\r\n    if (vacation == true)\r\n    {\r\n        if (day > 0 && day < 6)\r\n            alarm = \"10:00\";\r\n        if (day == 0 || day == 6)\r\n            alarm = \"off\";\r\n    }\r\n    if (vacation == false)\r\n    {\r\n        if (day > ",
+      "1": "public String alarmClock(int day, boolean vacation)\r\n{\r\n    if (vacation){\r\n        if (day == 0 || day == 6){\r\n            return \"off\";\r\n        } else {\r\n            return \"10:00\";\r\n        }\r\n    }else if (day == 0 || day == 6){\r\n        return \"10:00\";\r\n    }\r\n    return \"7:00\";\r\n    \r\n       "
+    }
+  },
+  "1": {
+    "prompt": "Write a function in Java that implements the following logic: Given 2 ints, a and b, return their sum. However, sums in ",
+    "total_correct": 241,
+    "unique_solutions": 206,
+    "best_k": 5,
+    "silhouette": 0.5069091320037842,
+    "silhouette_by_k": {
+      "2": 0.47419223189353943,
+      "3": 0.491912841796875,
+      "4": 0.4980425536632538,
+      "5": 0.5069091320037842,
+      "6": 0.26691341400146484,
+      "7": 0.3776775598526001
+    },
+    "cluster_sizes": {
+      "2": 15,
+      "0": 87,
+      "1": 98,
+      "3": 4,
+      "4": 2
+    },
+    "representatives": {
+      "0": "public int sortaSum(int a, int b)\r\n{\r\n if (a + b >= 10 && a + b <= 19) {\r\n     return 20;\r\n }\r\n    else {\r\n        return (a+b);\r\n    }\r\n}\r\n",
+      "1": "public int sortaSum(int a, int b)\r\n{\r\n    int sum = a + b;\r\n    if (sum >= 10 && sum <= 19)\r\n    {\r\n        return 20;\r\n    }\r\n    else\r\n        return sum;\r\n}\r\n",
+      "2": "public int sortaSum(int a, int b)\r\n{\r\n    int c = a+b;\r\n    if (c >= 10 && c <= 19)\r\n    {\r\n        return 20;\r\n    }\r\n    else \r\n    {\r\n        return c;\r\n    }\r\n}\r\n",
+      "3": "public int sortaSum(int a, int b)\r\n{\r\n    \r\n    if (a+b > 9 && a+b < 20)\r\n        return 20;\r\n    else\r\n        return a+b;\r\n}\r\n",
+      "4": "public int sortaSum(int a, int b)\r\n{\r\n    int sum = a + b;\r\n    \r\n    if (sum == 10 || sum == 11 || sum == 12 || sum == 13 || sum == 14 || sum == 15 || sum == 16 || sum == 17 || sum == 18 || sum == 19) \r\n    {\r\n        return 20;\r\n    }\r\n    return sum;\r\n}\r\n"
+    }
+  },
+  "44": {
+    "prompt": "Write a function in Java that takes an int array as its parameter and returns the number of even ints it contains. Note:",
+    "total_correct": 241,
+    "unique_solutions": 195,
+    "best_k": 2,
+    "silhouette": 0.47118261456489563,
+    "silhouette_by_k": {
+      "2": 0.47118261456489563,
+      "3": 0.3989570140838623,
+      "4": 0.37261560559272766,
+      "5": 0.37263625860214233,
+      "6": 0.37614476680755615,
+      "7": 0.34311115741729736
+    },
+    "cluster_sizes": {
+      "0": 147,
+      "1": 48
+    },
+    "representatives": {
+      "0": "public int countEvens(int[] nums)\r\n{\r\n    int count = 0;\r\n    for (int i = 0; i < nums.length; i++)\r\n    {\r\n     \tif (nums[i] % 2 == 0)\r\n        {\r\n         \tcount++;   \r\n        }\r\n    }\r\n    return count;\r\n}\r\n",
+      "1": "public int countEvens(int[] nums)\r\n{\r\n    int evens = 0;\r\n    for(int i = 0; i < nums.length; i++)\r\n    {\r\n        if(nums[i] % 2 == 0)\r\n        {\r\n            evens++;\r\n        }\r\n    }\r\n    return evens;\r\n}\r\n"
+    }
+  },
+  "100": {
+    "prompt": "For this problem, we'll round an int value up to the next multiple of 10 if its rightmost digit is 5 or more, so 15 roun",
+    "total_correct": 240,
+    "unique_solutions": 212,
+    "best_k": 3,
+    "silhouette": 0.27346301078796387,
+    "silhouette_by_k": {
+      "2": 0.2412649244070053,
+      "3": 0.27346301078796387,
+      "4": 0.19091618061065674,
+      "5": 0.19029659032821655,
+      "6": 0.21520571410655975,
+      "7": 0.20361720025539398
+    },
+    "cluster_sizes": {
+      "1": 154,
+      "0": 19,
+      "2": 39
+    },
+    "representatives": {
+      "0": "public int roundSum(int a, int b, int c)\r\n{\r\n    return (round10(a) + round10(b) + round10(c));\r\n}\r\n\r\npublic int round10(int num)\r\n{\r\n    int digit = num % 10;\r\n\tif (digit >= 5)\r\n    {\r\n\t\treturn num + (10 - digit);\r\n    }\r\n\treturn num - digit;\r\n}\r\n",
+      "1": "public int roundSum(int a, int b, int c)\r\n{\r\n    return (round10(a) + round10(b) + round10(c));\r\n}\r\n\r\npublic int round10(int num)\r\n{\r\n    if (num % 10 >= 5)\r\n    {\r\n        return num + (10 - num % 10);\r\n    }\r\n    return num - num % 10;\r\n}\r\n",
+      "2": "public int roundSum(int a, int b, int c)\r\n{\r\n    int sum = 0;\r\n    sum = (round10(a) + round10(b) + round10(c));\r\n    return sum;\r\n}\r\n\r\npublic int round10(int num)\r\n{\r\n    int numm = num;\r\n    if (num % 10 >= 5)\r\n    {\r\n    \treturn (num + (10 - (num % 10)));\r\n    }\r\n    else\r\n    {\r\n    \treturn(num "
+    }
+  },
+  "36": {
+    "prompt": "Write a function in Java that counts the number of times the string \"code\" appears anywhere in the given string str, exc",
+    "total_correct": 240,
+    "unique_solutions": 194,
+    "best_k": 3,
+    "silhouette": 0.42039817571640015,
+    "silhouette_by_k": {
+      "2": 0.3722899258136749,
+      "3": 0.42039817571640015,
+      "4": 0.35030239820480347,
+      "5": 0.310845285654068,
+      "6": 0.3179357945919037,
+      "7": 0.3258422911167145
+    },
+    "cluster_sizes": {
+      "1": 100,
+      "0": 84,
+      "2": 10
+    },
+    "representatives": {
+      "0": "public int countCode(String str)\r\n{\r\n        int count = 0;\r\n    \r\n    for(int i = 0; i < str.length() - 3; i++) {\r\n        if(str.substring(i, i + 2).equals(\"co\") && str.charAt(i + 3) == 'e')\r\n            count++;\r\n    }\r\n                    \r\n    return count;\r\n}\r\n",
+      "1": "public int countCode(String str)\r\n{\r\n    int count = 0;\r\n    \r\n    for (int i = 0; i < str.length() - 3; i++)\r\n    {\r\n        if (str.charAt(i) == 'c' && str.charAt(i + 1) == 'o' && str.charAt(i + 3) == 'e')\r\n        {\r\n            count++;\r\n            i += 4;\r\n        }\r\n    }\r\n    \r\n    return co",
+      "2": "public int countCode(String str)\r\n{\r\nint yes = str.length();\r\n    \r\n\r\nint yum = (0);\r\n\r\n\r\n\r\nfor (int i=0; i < yes - 3; i++)\r\n{\r\nif (str.substring(i, i + 2).equals(\"co\") \r\n&& str.charAt(i + 3) == 'e')\r\n\r\nyum++;\r\n} \r\nreturn yum;\r\n}\r\n"
+    }
+  },
+  "37": {
+    "prompt": "Given two strings, return true if either of the strings appears at the very end of the other string, ignoring upper/lowe",
+    "total_correct": 238,
+    "unique_solutions": 196,
+    "best_k": 6,
+    "silhouette": 0.327465683221817,
+    "silhouette_by_k": {
+      "2": 0.2893694043159485,
+      "3": 0.280806303024292,
+      "4": 0.3036983013153076,
+      "5": 0.3116554319858551,
+      "6": 0.327465683221817,
+      "7": 0.25235629081726074
+    },
+    "cluster_sizes": {
+      "2": 63,
+      "0": 68,
+      "3": 14,
+      "1": 24,
+      "4": 10,
+      "5": 17
+    },
+    "representatives": {
+      "0": "public boolean endOther(String a, String b)\r\n{\r\n    String A;\r\n    A = a.toLowerCase();\r\n    String B;\r\n    B = b.toLowerCase();\r\n    \r\n    if (A.endsWith(B) || B.endsWith(A))\r\n    {\r\n        return true;\r\n    }\r\n    else\r\n    {\r\n        return false;\r\n    }\r\n}\r\n",
+      "1": "public boolean endOther(String a, String b)\r\n{\r\n    a = a.toLowerCase();\r\n    b = b.toLowerCase();\r\n    \r\n    String aEnd = \"\";\r\n    String bEnd = \"\";\r\n    \r\n    if (a.length() <= b.length()) {\r\n      bEnd = b.substring(b.length() - a.length());\r\n    }\r\n    if (b.length() <= a.length()) {\r\n      aEn",
+      "2": "public boolean endOther(String a, String b)\r\n{\r\n    int lengtha = a.length();\r\n    int lengthb = b.length();\r\n    String end;\r\n\tString temp;\r\n\ta = a.toLowerCase();\r\n\tb = b.toLowerCase();\r\n\tif (lengtha >= lengthb)\r\n    {\r\n\t\tend = a.substring(lengtha - lengthb);\r\n\t\ttemp = b;\r\n\t}\r\n\telse\r\n\t{\r\n\t\tend = b.",
+      "3": "public boolean endOther(String a, String b)\r\n{\r\n    int aLen = a.length();\r\n\tint bLen = b.length();\r\n\tString end;\r\n\tString temp;\r\n\ta = a.toLowerCase();\r\n\tb = b.toLowerCase();\r\n\tif(aLen >= bLen)\r\n\t{\r\n\t\tend = a.substring(aLen - bLen);\r\n\t\ttemp = b;\r\n\t}\r\n\telse\r\n\t{\r\n\t\tend = b.substring(bLen - aLen);\r\n\t\tt",
+      "4": "public boolean endOther(String a, String b)\r\n{\r\n    String aLower = a.toLowerCase();\r\n    String bLower = b.toLowerCase();\r\n    if(aLower.endsWith(bLower) || bLower.endsWith(aLower))\r\n        return true;\r\n    return false;\r\n}\r\n",
+      "5": "public boolean endOther(String a, String b)\r\n{\r\n    a = a.toLowerCase();\r\n   int aLen = a.length();\r\n   b = b.toLowerCase();\r\n  int bLen = b.length();   \r\n  if (aLen < bLen) \r\n  {\r\n    String temp = b.substring(bLen - aLen, bLen);\r\n    if (temp.compareTo(a) == 0)\r\n      return true;\r\n    else\r\n     "
+    }
+  },
+  "33": {
+    "prompt": "Write a function in Java that implements the following logic: Given two strings, a and b, create a bigger string made of",
+    "total_correct": 236,
+    "unique_solutions": 190,
+    "best_k": 7,
+    "silhouette": 0.2515445053577423,
+    "silhouette_by_k": {
+      "2": 0.22863279283046722,
+      "3": 0.2336251437664032,
+      "4": 0.23017682135105133,
+      "5": 0.2488834112882614,
+      "6": 0.21657365560531616,
+      "7": 0.2515445053577423
+    },
+    "cluster_sizes": {
+      "6": 25,
+      "1": 37,
+      "5": 29,
+      "3": 37,
+      "2": 44,
+      "4": 14,
+      "0": 4
+    },
+    "representatives": {
+      "0": "public String mixString(String a, String b)\r\n{\r\n    char[] arr;\r\n    String end;\r\n    int count = 0;\r\n        \r\n    if(a.length() < b.length()) {\r\n        arr = new char[2 * a.length()];\r\n        end = b.substring(a.length());\r\n    } else {\r\n        arr = new char[2 * b.length()];\r\n        end = a.s",
+      "1": "public String mixString(String a, String b)\r\n{\r\n    String result = \"\";\r\n    int i;\r\n    for (i = 0; i < a.length() && i < b.length(); i++)\r\n    {\r\n        result = result + a.charAt(i);\r\n        result = result + b.charAt(i);\r\n    }\r\n    if (a.length() < b.length())\r\n    {\r\n        result = result ",
+      "2": "public String mixString(String a, String b)\r\n{\r\n    int aLen = a.length();\r\n    int bLen = b.length();\r\n    int i = 0;\r\n    StringBuilder stbuild = new StringBuilder (aLen + bLen);\r\n    for(; i < aLen && i < bLen; i++)\r\n    {\r\n        stbuild.append(a.charAt(i));\r\n        stbuild.append(b.charAt(i))",
+      "3": "public String mixString(String a, String b)\r\n{\r\n    String result = \"\";\r\n    int index = 0;\r\n    \r\n    if(a.length()>=b.length()) index = b.length();\r\n    if(a.length()<=b.length()) index = a.length();  \r\n    \r\n    \r\n    for(int i=0; i<index; i++){\r\n      result += a.substring(i, i+1) + b.substring(",
+      "4": "public String mixString(String a, String b)\r\n{\r\n    String newString = \"\";\r\n    if (a.length() >= b.length())\r\n    {\r\n        for (int i = 0; i < b.length(); i++)\r\n        {\r\n            newString = newString + a.charAt(i) + b.charAt(i);\r\n        }\r\n        newString = newString + a.substring(b.leng",
+      "5": "public String mixString(String a, String b)\r\n{\r\n    String newStr = \"\";\r\n    \r\n    if (a.length() > b.length())\r\n    {\r\n        for (int i = 0; i < b.length(); i++)\r\n        {\r\n            newStr = newStr + a.charAt(i) + b.charAt(i); \r\n        }\r\n        newStr = newStr + a.substring(b.length());  \r",
+      "6": "public String mixString(String a, String b)\r\n{\r\n    int aLen = a.length();\r\n  int bLen = b.length();\r\n  int max = Math.max(aLen, bLen);\r\n  String word = \"\";\r\n   \r\n  for (int i = 0; i < max; i++) {\r\n    if (i <= aLen-1)\r\n      word += a.substring(i,i+1);\r\n    if (i <= bLen-1)\r\n      word += b.substri"
+    }
+  }
+}
